@@ -18,6 +18,7 @@
 	h1, h2, h3
 	{
 		margin: 0;
+		margin-bottom: 20px;
 		padding: 0;
 		font-weight: 600;
 		color: #333333;
@@ -67,6 +68,13 @@
 	.image
 	{
 		display: inline-block;
+	}
+
+	.imageMe
+	{
+		display: inline-block;
+		display: block;
+		width: 100%;
 	}
 
 	.image img
