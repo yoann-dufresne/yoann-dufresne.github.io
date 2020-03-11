@@ -10,7 +10,7 @@ I am a computer scientist holding a PhD in bioinformatics.
 I am curentlty working at the institut Pasteur in Paris in the Rayan Chikhi group ["Sequence Bioinformatics"](https://research.pasteur.fr/en/team/sequence-bioinformatics/).
 
 My daily work is focused on algorithmics and datastructures for bioinformatics problems.
-In other words, I am creating methods and softwares to solve now problems or to improve performances of already solved problems.
+In other words, I am creating methods and softwares to solve new problems or to improve performances of already solved problems in bioinformatics.
 
 I'm also very interested in alternative game design, more specifically into alternative controllers.
 I created a few games during the "Art Game Weekend" and "Zoomachine festival".
@@ -40,4 +40,4 @@ Artefect is a puzzle game design for zen puzzle solving for groups of people.
 
 # Publications:
 
-
+{% bibliography --file MyCollection %}
