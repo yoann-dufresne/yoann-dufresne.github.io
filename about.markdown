@@ -24,13 +24,19 @@ Since 2018 I'm a research engineer at the [institut Pasteur](https://research.pa
 # Games
 
 * **Spaceship**: A cooperative game where 3 people have to maintain alive a spaceship (6 diseminated computers) during a 4 minutes journey. [Github](https://github.com/yoann-dufresne/Spaceship_node)
-* **A Maze In Chair**: [See more](https://shakethatbutton.com/a-maze-in-chair/), [facebook](https://www.facebook.com/amazeinchair/)
-* **Artefact**: [See more](http://bidouilleurslibristes.org/Artefact/), [Github](https://github.com/yoann-dufresne/Artefact)
+* **A Maze In Chair**: Your Character is running away, trying to avoid a lot of incoming obstacles.
+The chair where you sat is the only way to help him.
+The character follow your chair movments, help him to avoid the surrounding obstacles.
+[See more](https://shakethatbutton.com/a-maze-in-chair/), [facebook](https://www.facebook.com/amazeinchair/)
+* **Artefact**: 3 meters by 3 meters dark room, 8 multicolor led stips, a lot of colored buttons.
+In this game, you goal is to understand the rules of interaction between buttons and colored led strips.
+Artefect is a puzzle game design for zen puzzle solving for groups of people.
+[See more](http://bidouilleurslibristes.org/Artefact/), [Github](https://github.com/yoann-dufresne/Artefact)
 
 # Softwares
 
 * **Smiles2Monomers**: A software to detect monomers into a 2D structure of a polymer. The software was created during my PhD thesis for application to Nonribosomal Peptides in the [Norine database](https://bioinfo.lifl.fr/norine/). [Webpage](https://bioinfo.lifl.fr/norine/smiles2monomers.jsp), [Github](https://github.com/yoann-dufresne/Smiles2Monomers)
-* **SLIM**: Webserver to create pipelines for ecological survey. Designed to be realy easy to use for biologist without computer science knowledge. A particular effort has been made to ensure reproducibility. [Website](https://trtcrd.github.io/SLIM/), [Github](https://github.com/yoann-dufresne/SLIM)
+* **SLIM**: Webserver to create pipelines for ecological survey. Designed to be really easy to use for biologists without computer science knowledge. A particular effort has been made to ensure reproducibility. [Website](https://trtcrd.github.io/SLIM/), [Github](https://github.com/yoann-dufresne/SLIM)
 
 # Publications:
 
