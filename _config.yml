@@ -31,14 +31,10 @@ github_username:  yoann-dufresne
 theme: minima
 plugins:
   - jekyll-feed
-  - jekyll-scholar
 
 sass:
   sass_dir: ./_scss
 
-scholar:
-  sort_by: year
-  order: descending
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
