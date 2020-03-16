@@ -1,0 +1,3 @@
+[submodule "bibtex-js"]
+	path = bibtex-js
+	url = https://github.com/pcooksey/bibtex-js.git

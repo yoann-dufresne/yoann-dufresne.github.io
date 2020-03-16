@@ -1,0 +1,24 @@
+---
+layout: default
+---
+<article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">{{ page.title | escape }}</h1>
+  </header>
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  <bibtex src="{{ "/assets/MyCollection.bib" | relative_url }}"></bibtex>
+  <div class="bibtex_structure">
+    <div class="sort year" extra="DESC number">
+      <div class="templates"></div>
+    </div>
+  </div>
+
+  <h1 id="publications">Publications:</h1>
+  <div id="bibtex_display"></div>
+
+</article>

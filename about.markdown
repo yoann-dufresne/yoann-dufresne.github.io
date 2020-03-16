@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: about
 title: About
 permalink: /about/
 ---
@@ -37,6 +37,4 @@ Artefect is a puzzle game design for zen puzzle solving for groups of people.
 
 * **Smiles2Monomers**: A software to detect monomers into a 2D structure of a polymer. The software was created during my PhD thesis for application to Nonribosomal Peptides in the [Norine database](https://bioinfo.lifl.fr/norine/). [Webpage](https://bioinfo.lifl.fr/norine/smiles2monomers.jsp), [Github](https://github.com/yoann-dufresne/Smiles2Monomers)
 * **SLIM**: Webserver to create pipelines for ecological survey. Designed to be really easy to use for biologists without computer science knowledge. A particular effort has been made to ensure reproducibility. [Website](https://trtcrd.github.io/SLIM/), [Github](https://github.com/yoann-dufresne/SLIM)
-
-# Publications:
 
