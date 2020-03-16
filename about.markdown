@@ -40,4 +40,3 @@ Artefect is a puzzle game design for zen puzzle solving for groups of people.
 
 # Publications:
 
-{% bibliography --file MyCollection %}
