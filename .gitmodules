@@ -1,3 +1,6 @@
 [submodule "bibtex-js"]
 	path = bibtex-js
 	url = https://github.com/pcooksey/bibtex-js.git
+[submodule "_lib/MathJax-src"]
+	path = _lib/MathJax-src
+	url = https://github.com/mathjax/MathJax-src.git

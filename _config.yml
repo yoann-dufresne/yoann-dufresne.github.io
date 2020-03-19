@@ -31,6 +31,7 @@ github_username:  yoann-dufresne
 theme: minima
 plugins:
   - jekyll-feed
+markdown: kramdown
 
 sass:
   sass_dir: ./_scss

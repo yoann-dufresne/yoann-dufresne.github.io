@@ -4,6 +4,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {%- seo -%}
   <script type="text/javascript" src="{{ "/js/bibtex_js.js" | relative_url }}"></script>
+  {% if page.use_math %}
+    {% include mathjax_support.html %}
+  {% endif %}
   <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
   {%- feed_meta -%}
   {%- if jekyll.environment == 'production' and site.google_analytics -%}
