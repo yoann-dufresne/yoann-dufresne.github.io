@@ -7,23 +7,23 @@ use_math: true
 categories: informatics
 ---
 
-Why this blogpost ?
-Explain here bitvector + rank/select
-Interest of bitvectors
-
-The complete datastructure is composed of 2 main components.
-The succint bitvector itself and complementary datastructures to support rank and select operations in constant time.
-
-A few years ago, Alex Bow did a good work explaining [how to perform rank in constant time on RRR bitvectors](https://alexbowe.com/rrr/).
-This article explain well the datastructure behind the constant time rank operation.
-Here I will try to explain the select datastructure as clear as Alex Bow did the rank.
-
-First I will go back to the bitvector succintness basis and then focus on the datastructure needed for the select.
+Today, I will explain how to perform a select request on a bitvector compacted inside of a RRR datastructure.
+Currently, I am working with Rayan Chikhi and two students on a library for bioinformatics that uses a bitvector to store information.
+As our bitvector can be composed of $4^64$ bits, we have to represent in a compacted or compressed way.
+This leads me to read the articles about the RRR datastrcture and [the blogpost from Alex Bow](https://alexbowe.com/rrr/) that clarify the way to perform a rank on it.
+For our bioinformatics work, we will not use the RRR representation as the sd arrays are more compact but I dug to subject by curiosity to understand the technics behind the constant time select.
+As the RRR original articles are hard to read, I hope that this post will help for understanding.
 
 # Bitvector structure
 
 A bitvector is a vector containing only 0's and 1's.
-For this post, I will assume that there is a majority of 0 in the bitvector and that we want to rank/select the 1 values.
+On a bitvector $b$, rank and select operations are defined as follow:
+
+* $rank_{1}(i) = \sum_{j=0}^{i}{b_i}$ : Count the number of 1 from the begining of the vector to the ith position.
+* $rank_{0}(i) = i - rank_{1}(i)$ : Count the number of 0 from the begining of the vector to the ith position.
+* $select_{u}(i) = min(x \| rank_{u}(x) == i)$ : Return the position of the ith bit set to $u$.
+
+For this post, I will assume that there is a majority of 0 in the bitvector and that we want to perform select operations on 1's.
 Of course, everything is symetrical, so it's easy to centrer everything on 0's instead of 1's.
 
 A bitvector has two main parameters: its size and the number of bit set to 1.
