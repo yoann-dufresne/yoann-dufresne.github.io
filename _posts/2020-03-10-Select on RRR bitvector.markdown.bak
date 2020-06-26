@@ -11,7 +11,7 @@ Currently, I am working with Rayan Chikhi and two students on a library for bioi
 As our bitvector can be composed of $4^{64}$ bits, we have to represent in a compacted or compressed way.
 During my readings on bitvectors I found the papers of Raman, Raman and Rao (that's why RRR) in [SIM-SIAM symposium in 2002](https://dl.acm.org/doi/10.5555/545381.545411) and [ACM Transactions on Algorithms in 2007](https://dl.acm.org/doi/10.1145/1290672.1290680).
 This is not the bitvector that we are currently using but the technics for performing rank and select in constant time are very interesting.
-The details of the datastructure are very hard to understand and thankfully to Alex Bow, the rank operation datastructure have been explained in a [previous blogpost](https://alexbowe.com/rrr/).
+The details of the datastructure are very hard to understand and thanckfully to Alex Bow, the rank operation datastructure have been explained in a [previous blogpost](https://alexbowe.com/rrr/).
 Here I will try to be as clear as possible to describe the datastructure supporting the select operation in constant time.
 
 # Rank and Select
@@ -19,12 +19,12 @@ Here I will try to be as clear as possible to describe the datastructure support
 First let's describe the rank and select operations on a bitvector $b$ of size $m$ where $b_i$ is the $i^{th}$ bit of the vector.
 The operations are described as follow:
 
-* $rank_{1}(i) = \sum_{j=0}^{i}{b_j}$ : Count the number of 1 from the beginning of the vector to the ith position.
-* $rank_{0}(i) = i - rank_{1}(i)$ : Count the number of 0 from the beginning of the vector to the ith position.
+* $rank_{1}(i) = \sum_{j=0}^{i}{b_j}$ : Count the number of 1 from the begining of the vector to the ith position.
+* $rank_{0}(i) = i - rank_{1}(i)$ : Count the number of 0 from the begining of the vector to the ith position.
 * $select_{u}(i) = min(x \| rank_{u}(x) == i)$ : Return the position of the ith bit set to $u$.
 
 For this post, I will assume that there is a majority of 0 in the bitvector and that we want to perform rank and select operations on bits set to 1.
-Of course, everything is symmetrical, so it's easy to replace the 1s by 0s.
+Of course, everything is symetrical, so it's easy to replace the 1s by 0s.
 
 # Bitvector structure
 
@@ -32,18 +32,18 @@ A bitvector has two main parameters: its size and the number of bit set to 1.
 I will call $m$ the size of the bitvector and $n$ the number of 1.
 By definition, a fully explicit bitvector occupy $m$ bits into memory.
 The RRR bitvector is sliced into small blocks of equal size $u$ (For optimality in the article $u = { {1}\over{2} } lg\,m$).
-Each block represent a chunk of the bitvector that we call $S_i$ and there are $p$ blocks ($p = m / u$).
+Each block represent a chunck of the bitvector that we call $S_i$ and there are $p$ blocks ($p = m / u$).
 
 Basic blocs bit vector
 
-Each of the $S_i$ can be represented by two integers: the number of bit set to 1 $c_i$ and an offset identifier ($o_i$).
-The number of bit set is also called *class* of the chunk.
+Each of the $S_i$ can be represented by two integers: the number of bit set to 1 $c_i$ and an offset identifyer ($o_i$).
+The number of bit set is also called *class* of the chunck.
 The are exactly ${u\choose c_i}$ different possible blocks containing $c_i$ bit set to 1.
 Imagine that all these possible blocks are sorted lexicographically, then $o_i$ is the position of the block in that order.
 
 Figure with enumeration and order of offsets for one class
 
-Figure succinct bitvector
+Figure succint bitvector
 
 For each block, storing $c_i$ take exactly $\lceil lg\,u \rceil$ bits regardless the block.
 Storing $o_i$ take $\lceil lg{b\choose c_i} \rceil$ bits.
@@ -60,12 +60,12 @@ Regular select values means an array C where:
 * $C[0] = 0$
 * $C[i] = \lfloor {select(i \times c) \over u} \rfloor$, with $c = (lg\,p)^2$
 
-By the division by u, we keep track of the block indices where the select remains.
+By the division by u, we keep track of the block indicies where the select remains.
 
 We now define a segment of blocks $\sigma_i$ as a consecutive list of block starting at $C[i]$ and ending at $C[i+1]-1$.
 $\sigma_i$ is called sparse if it contains at least $(lg\,p)^4$ bits, dense otherwise.
-In sparse segments, the block index of the select are explicitly stored.
-To save space, the block indexes are relative to the beginning of the segment.
+In sparse segments, the block index of the select are exeplicitly stored.
+To save space, the block indexes are relative to the begining of the segment.
 
 Figure for sparse block
 
@@ -90,22 +90,22 @@ C[i+1] is the index of the first block of the next segment.\\
 Figure of the segment with relative/real select i, i+1 positions.
 
 2. Determine if the select value is present in the beginning of the block C[i+1].
-Because the precomputed select are not necessarily lying at the first position of a block, we have to verify the beginning of the C[i+1] block.
+Because the precomputed select are not neceseraly lying at the first position of a block, we have to verify the begining of the C[i+1] block.
 If $rank(C[i+1] \times u) > (i+1) \times (lg\,p)^2$ (ie. $psA[C[i+1]]$), C[i+1] is the block where we have to look for the result.
 
 3. If the select index is in the segment starting with the block C[i], we have to determine if it's sparse or dense regarding the length.
-* If it's sparse, go to the beginning of the sparse segment datastructure $\sigma$. The relative indexes of the blocks containing the ones are explicitly stored. So, first get the relative select value by doing $r = x - rank(C[i])$. Then get the relative index for the block of interest with $j_{rel} = \sigma[r]$. Finally the absolute index of the bloc is obtained by doing $j_{abs} = C[i] + j_{rel}$. The selected bit is inside of the block of index $j_{abs}$.
+* If it's sparse, go to the begining of the sparse segment datastructure $\sigma$. The relative indexes of the blocks containing the ones are explicitely stored. So, first get the relative select value by doing $r = x - rank(C[i])$. Then get the relative index for the block of interest with $j_{rel} = \sigma[r]$. Finally the absolute index of the bloc is obtained by doing $j_{abs} = C[i] + j_{rel}$. The selected bit is inside of the block of index $j_{abs}$.
 * If it's dense, get the tree corresponding to the segment $\sigma$.
-From the root of the tree, perform a search into the array corresponding to the bit content of each subtree. Repeat the operation until the leaf that correspond to the relative index of the block containing the selected block. The same relative to absolute index search is performed than the one in space segments.\\
+From the root of the tree, perform a search into the array corresponding to the bit content of each subtree. Repeat the operation until the leaf that correspond to the relative index of the block containing the selected block. The same relative to absolute index search is performed thant the one in space segments.\\
 \\
-**Note**: for dense blocks, without further information, the search in an array of a node is not done in constant time. Using a partial sum array allow a dichotomic search for the right subtree. But the authors of the datastructure claim "This can be done in constant time using a lookup table" and then say that the whole structure can be stored in $O(\sqrt{lg\,p}\,lg\,lg\,p)$ but without further explanations. I am not sure how to do this step in constant time. So, if you, the reader, are able to explain me, please contact me !
+**Note**: for dense blocks, without further information, the search in an array of a node is not done in constant time. Using a partial sum array allow a dichotomic search for the right subtree. But the authors of the datastructure claim "This can be done in constant time using a lookup table" and then say that the whole structure can be strored in $O(\sqrt{lg\,p}\,lg\,lg\,p)$ but without further explanations. I am not sure how to do this step in constant time. So, if you, the reader, are able to explain me, please contact me !
 
-4. Get the select value inside of the extracted block. Here there is no magic, everything is precomputed in a huge lookup table. With the class and the offset of the block, we can directly jump to the precomputed row and then to the column corresponding to the selected bit inside of the block.
+4. Get the select value inside of the extracted block. Here there is no maggic, everything is precomputed in a huge lookup table. With the class and the offset of the block, we can directly jump to the precomputed row and then to the column corresponding to the selected bit inside of the block.
 
 
 # Remarks
 
-This blogpost is only due to my curiosity on the theory but I think that this structure is not practical. Many improvements have be done since the first publication of this work. The purpose of the blogpost is only the clarification of the technics as the scientific papers about RRR are very complicated to read.
+This blogpost is only due to my curisity on the theory but I think that this structure is not practical. Many improvements have be done since the first publication of this work. The purpose of the blogpost is only the clarification of the technics as the scientific papers about RRR are very complicated to read.
 
 To understand and write this post, I was helped by Rayan Chikhi. I thank him a lot for the amount of time that he used for it.
 
