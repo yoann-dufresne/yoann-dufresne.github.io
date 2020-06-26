@@ -34,16 +34,18 @@ By definition, a fully explicit bitvector occupy $m$ bits into memory.
 The RRR bitvector is sliced into small blocks of equal size $u$ (For optimality in the article $u = { {1}\over{2} } lg\,m$).
 Each block represent a chunk of the bitvector that we call $S_i$ and there are $p$ blocks ($p = m / u$).
 
-Basic blocs bit vector
+{:refdef: style="text-align: center;"}
+![](/assets/imgs/RRR_select/bv_slices.png)
+{: refdef}
 
 Each of the $S_i$ can be represented by two integers: the number of bit set to 1 $c_i$ and an offset identifier ($o_i$).
 The number of bit set is also called *class* of the chunk.
 The are exactly ${u\choose c_i}$ different possible blocks containing $c_i$ bit set to 1.
 Imagine that all these possible blocks are sorted lexicographically, then $o_i$ is the position of the block in that order.
 
-Figure with enumeration and order of offsets for one class
-
-Figure succinct bitvector
+{:refdef: style="text-align: center;"}
+![](/assets/imgs/RRR_select/compact_block.png)
+{: refdef}
 
 For each block, storing $c_i$ take exactly $\lceil lg\,u \rceil$ bits regardless the block.
 Storing $o_i$ take $\lceil lg{b\choose c_i} \rceil$ bits.
@@ -51,6 +53,10 @@ So, the amount of bit needed for a basic block depend on its class.
 The values are computed in two different arrays: A for classes and B for offsets.
 A prefix sum array is also computed on A where $psA[i] = \sum_{j=0}^{i-1}{A[j]}$.
 Note that $psA[i] = rank(i \times u)$, so it will be use for fast access to rank values.
+
+{:refdef: style="text-align: center;"}
+![](/assets/imgs/RRR_select/bv_succint.png)
+{: refdef}
 
 # Construction of the select datastructures
 
@@ -62,19 +68,27 @@ Regular select values means an array C where:
 
 By the division by u, we keep track of the block indices where the select remains.
 
+{:refdef: style="text-align: center;"}
+![](/assets/imgs/RRR_select/segment.png)
+{: refdef}
+
 We now define a segment of blocks $\sigma_i$ as a consecutive list of block starting at $C[i]$ and ending at $C[i+1]-1$.
 $\sigma_i$ is called sparse if it contains at least $(lg\,p)^4$ bits, dense otherwise.
 In sparse segments, the block index of the select are explicitly stored.
 To save space, the block indexes are relative to the beginning of the segment.
 
-Figure for sparse block
+{:refdef: style="text-align: center;"}
+![](/assets/imgs/RRR_select/sparse.png)
+{: refdef}
 
 For dense segments, a tree datastructure is created with a branching factor of $\sqrt{lg\,p}$.
 So, because there is at most $(lg\,p)^4$ bits, the height of the tree is bounded by a constant.
 The leaves of the tree are the blocks of the segment.
 The nodes are arrays containing the numbers of bit set to 1 in the subtrees.
 
-Figure for dense block
+{:refdef: style="text-align: center;"}
+![](/assets/imgs/RRR_select/dense.png)
+{: refdef}
 
 
 # (Almost ?) O(1) select requests
