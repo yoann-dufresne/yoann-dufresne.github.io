@@ -9,7 +9,7 @@ categories: informatics
 
 Currently, I am working with Rayan Chikhi and two students on a library for bioinformatics that uses a bitvector to store information and rank and select operations to interogate it.
 As our bitvector can be composed of $4^{64}$ bits, we have to represent in a compacted or compressed way.
-During my readings on bitvectors I found the papers of Raman, Raman and Rao (that's why RRR) in [SIM-SIAM symposium in 2002](https://dl.acm.org/doi/10.5555/545381.545411) and [ACM Transactions on Algorithms](https://dl.acm.org/doi/10.1145/1290672.1290680).
+During my readings on bitvectors I found the papers of Raman, Raman and Rao (that's why RRR) in [SIM-SIAM symposium in 2002](https://dl.acm.org/doi/10.5555/545381.545411) and [ACM Transactions on Algorithms in 2007](https://dl.acm.org/doi/10.1145/1290672.1290680).
 This is not the bitvector that we are currently using but the technics for performing rank and select in constant time are very interesting.
 The details of the datastrcture are very hard to understand and thanckfully to Alex Bow, the rank operation datastructure have been explained in a [previous blogpost](https://alexbowe.com/rrr/).
 Here I will try to be as clear as possible to describe the datastructure supporting the select operation in constant time.
@@ -23,20 +23,20 @@ The operations are described as follow:
 * $rank_{0}(i) = i - rank_{1}(i)$ : Count the number of 0 from the begining of the vector to the ith position.
 * $select_{u}(i) = min(x \| rank_{u}(x) == i)$ : Return the position of the ith bit set to $u$.
 
-For this post, I will assume that there is a majority of 0 in the bitvector and that we want to perform rank and select operations on 1's.
+For this post, I will assume that there is a majority of 0 in the bitvector and that we want to perform rank and select operations on bits set to 1.
 Of course, everything is symetrical, so it's easy to replace the 1s by 0s.
 
 # Bitvector structure
 
 A bitvector has two main parameters: its size and the number of bit set to 1.
 I will call $m$ the size of the bitvector and $n$ the number of 1.
-By definition, a fully explicit bitvector occupy $m$ bits into the memory.
-The RRR bitvector is spliced into small blocks of equal size $u$ (For optimality in the article $u = { {1}\over{2} } lg\,m$).
-Each block represent a chunck of the universe that we call $U_i$ and there are $p$ blocks ($p = m / u$).
+By definition, a fully explicit bitvector occupy $m$ bits into memory.
+The RRR bitvector is sliced into small blocks of equal size $u$ (For optimality in the article $u = { {1}\over{2} } lg\,m$).
+Each block represent a chunck of the bitvector that we call $S_i$ and there are $p$ blocks ($p = m / u$).
 
 Basic blocs bit vector
 
-Each of the $U_i$ are represented by two integers: the number of bit set to 1 $c_i$ and an offset identifyer ($o_i$).
+Each of the $S_i$ can be represented by two integers: the number of bit set to 1 $c_i$ and an offset identifyer ($o_i$).
 The number of bit set is also called *class* of the chunck.
 The are exactly ${u\choose c_i}$ different possible blocks containing $c_i$ bit set to 1.
 Imagine that all these possible blocks are sorted lexicographically, then $o_i$ is the position of the block in that order.
@@ -50,16 +50,20 @@ Storing $o_i$ take $\lceil lg{b\choose c_i} \rceil$ bits.
 So, the amount of bit needed for a basic block depend on its class.
 The values are computed in two different arrays: A for classes and B for offsets.
 A prefix sum array is also computed on A where $psA[i] = \sum_{j=0}^{i-1}{A[j]}$.
-Note that $psA[i] = rank(i \times u)$.
+Note that $psA[i] = rank(i \times u)$, so it will be use for fast access to rank values.
 
 # Construction of the select datastructures
 
-For rapid acess to select a few of them are precomputed and used as anchors for the search.
+For rapid select operations some of the values are precomputed and used as anchors for the search.
 Instead of having select precomputed on regular indexes all along the vector, the RRR datastructure compute regular select values.
-Regular select values means an array C where $C[0] = 0$ and $C[i] = select(i \times c) / u$, where c is a constant ($(lg\,p)^2$ in the article).
-So, C contains the index of the blocks where the precomputed selects remain.
+Regular select values means an array C where:
+* $C[0] = 0$
+* $C[i] = \lfloor {select(i \times c) \over u} \rfloor$, with $c = (lg\,p)^2$
 
-Then, for each segment of blocks between C[i] included and C[i+1] excpluded, we call this segment sparse if it contains at least $(lg\,p)^4$ bits.
+By the division by u, we keep track of the block indicies where the select remains.
+
+We now define a segment of blocks $\sigma_i$ as a consecutive list of block starting at $C[i]$ and ending at $C[i+1]-1$.
+$\sigma_i$ is called sparse if it contains at least $(lg\,p)^4$ bits, dense otherwise.
 In sparse segments, the block index of the select are exeplicitly stored.
 To save space, the block indexes are relative to the begining of the segment.
 
