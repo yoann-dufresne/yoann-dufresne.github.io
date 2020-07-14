@@ -97,29 +97,47 @@ Figure globale select
 
 Let's consider that we want to perform a request select(x), where $0 <= x <= m$
 
-1. First of all, we have to find the block segment where the select belongs to.
-By computing $i= \lfloor x / \lfloor (lg\,p)^2 \rfloor \rfloor$ we have the index in C of the first block of the segment of interest.
-C[i+1] is the index of the first block of the next segment.\\
+1. First, find the block segment where the select belongs to.
+By computing $i= \lfloor x / \lfloor (lg\,p)^2 \rfloor \rfloor$, we know that the select value should be part of $\sigma_i$ or the beginning of the next block.\\
 \\
-Figure of the segment with relative/real select i, i+1 positions.
+{:refdef: style="text-align: center;"}
+![](/assets/imgs/RRR_select/segment_select.png)
+{: refdef}
 
-2. Determine if the select value is present in the beginning of the block C[i+1].
-Because the precomputed select are not necessarily lying at the first position of a block, we have to verify the beginning of the C[i+1] block.
-If $rank(C[i+1] \times u) > (i+1) \times (lg\,p)^2$ (ie. $psA[C[i+1]]$), C[i+1] is the block where we have to look for the result.
+2. It is possible that the select value is contained in the following bloc of $\sigma_i$ before the index of $select((i+1)(lg\,p)^2)$.
+So, we have to verify the beginning of the C[i+1] block (The green section on the above schema).
+If $rank(C[i+1] \times u) > (i+1) \times (lg\,p)^2$ (ie. $psA[C[i+1]]$), the value is contained in $C[i+1]$
 
-3. If the select index is in the segment starting with the block C[i], we have to determine if it's sparse or dense regarding the length.
-* If it's sparse, go to the beginning of the sparse segment datastructure $\sigma$. The relative indexes of the blocks containing the ones are explicitly stored. So, first get the relative select value by doing $r = x - rank(C[i])$. Then get the relative index for the block of interest with $j_{rel} = \sigma[r]$. Finally the absolute index of the bloc is obtained by doing $j_{abs} = C[i] + j_{rel}$. The selected bit is inside of the block of index $j_{abs}$.
-* If it's dense, get the tree corresponding to the segment $\sigma$.
-From the root of the tree, perform a search into the array corresponding to the bit content of each subtree. Repeat the operation until the leaf that correspond to the relative index of the block containing the selected block. The same relative to absolute index search is performed than the one in space segments.\\
+3. If the value is not part of C[i+1], we have to look inside of $\sigma_i$.
+* If it's sparse, go to the beginning of the sparse segment datastructure. The relative indexes of the blocks containing the ones are explicitly stored. So, first get the relative select value by doing $r = x - rank(C[i])$. Then get the relative index for the block of interest with $j_{rel} = \sigma_i[r]$. Finally the absolute index of the bloc is obtained by doing $j_{abs} = C[i] + j_{rel}$. The selected bit is inside of the block of index $j_{abs}$.
+* If it's dense, go to the root of the tree for $\sigma_i$.
+As for the sparce block, we are looking for a relative index $j_{rel}$ from the beginning of the segment.
+If the current node of the tree is n, n[x] is the $x^{th}$ cell of the array in the node.
+Search for the cell i such as $n[i] \leq j_{rel} < n[i+1]$.
+This search is easily done in log time as the nodes are partial sum arrays.
+The following node discuss about a constant time search.
+Go to the corresponding subnode and recursively do the search until you reach a leaf.
+The leaf is the block of interest.\\
 \\
-**Note**: for dense blocks, without further information, the search in an array of a node is not done in constant time. Using a partial sum array allow a dichotomic search for the right subtree. But the authors of the datastructure claim "This can be done in constant time using a lookup table" and then say that the whole structure can be stored in $O(\sqrt{lg\,p}\,lg\,lg\,p)$ but without further explanations. I am not sure how to do this step in constant time. So, if you, the reader, are able to explain me, please contact me !
+**Note**: As I just described, the search into a node partial sum array is performed in log time.
+This leads to a non constant query time.
+In the RRR article the authors claim "This can be done in constant time using a lookup table".
+Thay also say that the whole structure can be stored in $O(\sqrt{lg\,p}\,lg\,lg\,p)$ but without further explanations.
+In my mind, the only way to do it in constant time is to explicitely create one cell per possible select value at each level of the tree.
+Because a segment is created with $(lg\,p)^2$ bit set to 1, the arrays are of size $(lg\,p)^2$.
+This is not the same amount of memory than in the paper.
+So, if you, the reader, are able to explain how to constant time query in this space, please contact me !
 
-4. Get the select value inside of the extracted block. Here there is no magic, everything is precomputed in a huge lookup table. With the class and the offset of the block, we can directly jump to the precomputed row and then to the column corresponding to the selected bit inside of the block.
+4. We have a block B from the step 3. We have to extract the relative value to the beginning of the block.
+Here, everything is precomputed in a huge lookup table.
+With the class and the offset of the block, we can directly jump to the precomputed row and then to the column corresponding to the selected bit inside of the block.
+
+Finally, the select value is the sum of position of the selected segment, the relative index of the block inside of the segment and the relative position of the bit inside of the block.
 
 
 # Remarks
 
 This blogpost is only due to my curiosity on the theory but I think that this structure is not practical. Many improvements have be done since the first publication of this work. The purpose of the blogpost is only the clarification of the technics as the scientific papers about RRR are very complicated to read.
 
-To understand and write this post, I was helped by Rayan Chikhi. I thank him a lot for the amount of time that he used for it.
+To understand and write this post, I was helped by Rayan Chikhi. I thank him a lot for the time that he used for it.
 
