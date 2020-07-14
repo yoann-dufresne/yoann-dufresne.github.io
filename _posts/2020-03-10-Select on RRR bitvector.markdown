@@ -95,14 +95,11 @@ The nodes are arrays containing the numbers of bit set to 1 in the subtrees.
 
 Figure globale select
 
-Let's consider that we want to perform a request select(x), where $0 <= x <= m$
+Let's consider that we want to perform a request select(x), where $0 <= x <= m$.
+All the points here are pictured in the following schema.
 
 1. First, find the block segment where the select belongs to.
-By computing $i= \lfloor x / \lfloor (lg\,p)^2 \rfloor \rfloor$, we know that the select value should be part of $\sigma_i$ or the beginning of the next block.\\
-\\
-{:refdef: style="text-align: center;"}
-![](/assets/imgs/RRR_select/segment_select.png)
-{: refdef}
+By computing $i= \lfloor x / \lfloor (lg\,p)^2 \rfloor \rfloor$, we know that the select value should be part of $\sigma_i$ or the beginning of the next block.
 
 2. It is possible that the select value is contained in the following bloc of $\sigma_i$ before the index of $select((i+1)(lg\,p)^2)$.
 So, we have to verify the beginning of the C[i+1] block (The green section on the above schema).
@@ -133,6 +130,11 @@ Here, everything is precomputed in a huge lookup table.
 With the class and the offset of the block, we can directly jump to the precomputed row and then to the column corresponding to the selected bit inside of the block.
 
 Finally, the select value is the sum of position of the selected segment, the relative index of the block inside of the segment and the relative position of the bit inside of the block.
+
+Summary in one figure:
+{:refdef: style="text-align: center;"}
+![](/assets/imgs/RRR_select/segment_select.png)
+{: refdef}
 
 
 # Remarks
