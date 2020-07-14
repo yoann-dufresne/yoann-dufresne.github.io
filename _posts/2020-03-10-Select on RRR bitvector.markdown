@@ -111,7 +111,7 @@ If $rank(C[i+1] \times u) > (i+1) \times (lg\,p)^2$ (ie. $psA[C[i+1]]$), the val
 3. If the value is not part of C[i+1], we have to look inside of $\sigma_i$.
 * If it's sparse, go to the beginning of the sparse segment datastructure. The relative indexes of the blocks containing the ones are explicitly stored. So, first get the relative select value by doing $r = x - rank(C[i])$. Then get the relative index for the block of interest with $j_{rel} = \sigma_i[r]$. Finally the absolute index of the bloc is obtained by doing $j_{abs} = C[i] + j_{rel}$. The selected bit is inside of the block of index $j_{abs}$.
 * If it's dense, go to the root of the tree for $\sigma_i$.
-As for the sparce block, we are looking for a relative index $j_{rel}$ from the beginning of the segment.
+As for the sparse block, we are looking for a relative index $j_{rel}$ from the beginning of the segment.
 If the current node of the tree is n, n[x] is the $x^{th}$ cell of the array in the node.
 Search for the cell i such as $n[i] \leq j_{rel} < n[i+1]$.
 This search is easily done in log time as the nodes are partial sum arrays.
@@ -122,8 +122,8 @@ The leaf is the block of interest.\\
 **Note**: As I just described, the search into a node partial sum array is performed in log time.
 This leads to a non constant query time.
 In the RRR article the authors claim "This can be done in constant time using a lookup table".
-Thay also say that the whole structure can be stored in $O(\sqrt{lg\,p}\,lg\,lg\,p)$ but without further explanations.
-In my mind, the only way to do it in constant time is to explicitely create one cell per possible select value at each level of the tree.
+They also say that the whole structure can be stored in $O(\sqrt{lg\,p}\,lg\,lg\,p)$ but without further explanations.
+In my mind, the only way to do it in constant time is to explicitly create one cell per possible select value at each level of the tree.
 Because a segment is created with $(lg\,p)^2$ bit set to 1, the arrays are of size $(lg\,p)^2$.
 This is not the same amount of memory than in the paper.
 So, if you, the reader, are able to explain how to constant time query in this space, please contact me !
