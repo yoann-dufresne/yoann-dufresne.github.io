@@ -34,7 +34,7 @@ plugins:
 markdown: kramdown
 
 sass:
-  sass_dir: ./_scss
+  sass_dir: ./_sass
 
 # Exclude from processing.
 # The following items will not be processed, by default.

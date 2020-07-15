@@ -3,6 +3,7 @@ layout: post
 title:  "Select on RRR bitvector"
 date:   2020-03-16 14:00:00 +0100
 public: false
+comments_id: 1
 use_math: true
 categories: informatics
 ---
