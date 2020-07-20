@@ -14,8 +14,11 @@ During my readings on bitvectors I found the papers of Raman, Raman and Rao (tha
 This is not the bitvector that we are currently using but the technics for performing rank and select in constant time are very interesting.
 
 
-The details of the datastructure are very hard to understand and thankfully to [Alex Bowe](https://alexbowe.com), the rank operation datastructure have been explained in a [previous blogpost](https://alexbowe.com/rrr/).
-Here I will try to be as clear as possible to describe the datastructure supporting the select operation in constant time.
+The details of the datastructure are very hard to understand but thankfully to [Alex Bowe](https://alexbowe.com), the rank operation datastructure have been explained in a [previous blogpost](https://alexbowe.com/rrr/).
+However, as far as I know, there is no vulgarization articles on the RRR select datastructure.
+I think that is because of the difficulty to understand the original papers, the fact that the datastructure do not looks like "a practical solution" and because there are some fast implementations that use less space (Implementation from Navarro [here](https://link.springer.com/chapter/10.1007/978-3-540-89097-3_18) or SDSL [logarithmic implementation (line 448 to 534)](http://simongog.github.io/sdsl/a00248_source.html)).
+
+So, in this post, I will only focus on the select datastructure and the representation of the bitvector as it is needed for the select query.
 
 # Rank and Select
 
@@ -24,7 +27,7 @@ The operations are described as follow:
 
 * $rank_{1}(i) = \sum_{j=0}^{i}{b_j}$ : Count the number of 1 from the beginning of the vector to the ith position.
 * $rank_{0}(i) = i - rank_{1}(i)$ : Count the number of 0 from the beginning of the vector to the ith position.
-* $select_{u}(i) = min(x \| rank_{u}(x) == i)$ : Return the position of the ith bit set to $u$.
+* $select_{b}(i) = min(x \| rank_{b}(x) == i)$ : Return the position of the ith bit set to $b$.
 
 For this post, I will assume that there is a majority of 0 in the bitvector and that we want to perform rank and select operations on bits set to 1.
 Of course, everything is symmetrical, so it's easy to replace the 1s by 0s.
@@ -35,7 +38,8 @@ A bitvector has two main parameters: its size and the number of bit set to 1.
 I will call $m$ the size of the bitvector and $n$ the number of 1.
 By definition, a fully explicit bitvector occupy $m$ bits into memory.
 The RRR bitvector is sliced into small blocks of equal size $u$ (For optimality in the article $u = { {1}\over{2} } lg\,m$).
-Each block represent a chunk of the bitvector that we call $S_i$ and there are $p$ blocks ($p = m / u$).
+Each block represent a chunk of the bitvector that we call $b_i$ and there are $p$ blocks ($p = m / u$).
+For a block $b_i$, we call $i$ the block number.
 
 {:refdef: style="text-align: center;"}
 ![](/assets/imgs/RRR_select/bv_slices.png)
@@ -54,11 +58,11 @@ For each block, storing $c_i$ take exactly $\lceil lg\,u \rceil$ bits regardless
 Storing $o_i$ take $\lceil lg{b\choose c_i} \rceil$ bits.
 So, the amount of bit needed for a block depends on its class.
 The values for all $c_i$ and all $o_i$ are computed in two respective arrays $A$ and $B$.
-A prefix sum array is also computed on A where $psA[i] = \sum_{j=0}^{i-1}{A[j]}$.
-$A[i]$ corresponds to the number of 1s in the $i^{th}$ block, so $psA[j]$ stores the number of 1s from the beginning of the vector up to the block j-1.
-So, $psA[j]$ stores the rank of the last bit of the block j-1.
-It means that $psA[i] = rank(i \times u)$.
-psA will be used as constant time access to rank values for blocks.
+A prefix sum array is also computed on A where $ps\_A[i] = \sum_{j=0}^{i-1}{A[j]}$.
+$A[i]$ corresponds to the number of 1s in the $i^{th}$ block, so $ps\_A[j]$ stores the number of 1s from the beginning of the vector up to the block j-1.
+So, $ps\_A[j]$ stores the rank of the last bit of the block j-1.
+It means that $ps\_A[i] = rank(i \times u)$.
+$ps\_A$ will be used as constant time access to rank values for blocks.
 
 {:refdef: style="text-align: center;"}
 ![](/assets/imgs/RRR_select/bv_succint.png)
@@ -69,20 +73,20 @@ psA will be used as constant time access to rank values for blocks.
 For rapid select operations some of the values are precomputed and used as anchors for the search.
 Instead of having select precomputed on regular indexes all along the vector, the RRR datastructure compute regular select values:
 * $C[0] = 0$
-* $C[i] = \lfloor {select(i \times c) \over u} \rfloor$, with $c = (lg\,p)^2$
+* $C[i] = \lfloor {select(i \times c) \over u} \rfloor$, with $c = (lg\,p)^2$ (defined by the authors)
 
 By regular select values I don't mean "the same number of bits" between two consecutive precomputed values but "the same number of 1s" (exactly $c$ 1).
-Dividing the select value by u, the size of a block, keeps track of the block indices instead of the bit positions themselves.
+Dividing the select value by u, the size of a block, keeps track of the block numbers instead of the bit positions themselves.
 
 {:refdef: style="text-align: center;"}
 ![](/assets/imgs/RRR_select/segment.png)
 {: refdef}
 
-Segments $\sigma_i$, are defined as successions of blocks from the bitvector starting at $C[i]$ and ending at $C[i+1]-1$.
+We are now using the values of $C$ to consider the whole vector as a succession of segments from $\sigma_0$ to $\sigma_x$, where $\sigma_i$ is the segment that starts at the block $C[i]$ and ends at block $C[i+1]-1$.
 The segments can vary in size and we split them into two categories "sparse" and "dense".
-$\sigma_i$ is called sparse if it contains at least $(lg\,p)^4$ bits, dense otherwise.
-In sparse segments, the block index of the selects are explicitly stored.
-To save space, the block indexes are relative to the beginning of the segment.
+$\sigma_i$ is called sparse if it contains at least $(lg\,p)^4$ bits (either 0 and 1), dense otherwise.
+In sparse segments, the block numbers of the selects are explicitly stored.
+To save space, the numbers are stored relatively to the beginning of the segment.
 
 {:refdef: style="text-align: center;"}
 ![](/assets/imgs/RRR_select/sparse.png)
@@ -102,7 +106,13 @@ The tree structure is defined as follow:
 # (Almost ?) O(1) select requests
 
 Let's consider that we want to perform a request select(x), where $0 <= x <= m$.
-All the points of the request description are pictured in the following schema:
+The global idea is that the select value will be computed in 3 main steps before joining them together:
+- search for the rigth segment
+- search inside of the segment for the right block
+- search inside of the right block for the rigth bit.
+- sum the bit position, the block position and the segment position for the global position of the select.
+All these points are detailed in the followind figure/description pair.
+
 {:refdef: style="text-align: center;"}
 ![](/assets/imgs/RRR_select/segment_select.png)
 {: refdef}
@@ -112,12 +122,12 @@ To do so, compute $i= \lfloor x / \lfloor (lg\,p)^2 \rfloor \rfloor$.
 Because of the regular select values precomputed, we know that the select value should be part of $\sigma_i$ or the beginning of the first block of $\sigma_{i+1}$.
 
 2. Look at the first block of $\sigma_{i+1}$ before the index of $select((i+1)(lg\,p)^2)$ (The green section on the above schema).
-If $rank(C[i+1] \times u) > (i+1) \times (lg\,p)^2$ (ie. $psA[C[i+1]] > (i+1) \times (lg\,p)^2$), the value is contained in $C[i+1]$
+If $rank(C[i+1] \times u) > (i+1) \times (lg\,p)^2$ (ie. $ps\_A[C[i+1]] > (i+1) \times (lg\,p)^2$), the value is contained in $C[i+1]$
 
 3. If the value is part of $\sigma_i$:
-* If $\sigma_i$ is sparse, go to the beginning of the sparse segment datastructure. The relative indexes of the blocks containing the ones are explicitly stored. So, first get the relative select value by doing $r = x - psA[i]$. Then get the relative index for the block of interest with $j_{rel} = \sigma_i[r]$. Finally the absolute index of the bloc is obtained by doing $j_{abs} = C[i] + j_{rel}$. The selected bit is inside of the block of index $j_{abs}$.
+* If $\sigma_i$ is sparse, go to the beginning of the sparse segment datastructure. The relative indexes of the blocks containing the ones are explicitly stored. So, first get the relative select value by doing $r = x - ps\_A[i]$. Then get the relative block number of the block of interest with $j_{rel} = \sigma_i[r]$. Finally the absolute index of the bloc is obtained by doing $j_{abs} = C[i] + j_{rel}$. The selected bit is inside of the block numbered $j_{abs}$.
 * If it's dense, go to the root of the tree for $\sigma_i$.
-As for the sparse block, we are looking for a relative index $j_{rel}$ from the beginning of the segment.
+As for the sparse block, we are looking for a relative number $j_{rel}$ from the beginning of the segment.
 If the current node of the tree is $n$, $n[x]$ is the $x^{th}$ cell of the array in the node.
 Search for the cell $i$ such as $n[i] \leq j_{rel} < n[i+1]$.
 This search is easily done in log time as the nodes are partial sum arrays.
@@ -141,7 +151,7 @@ Here, everything is precomputed in a huge lookup table.
 With the class and the offset of the block, we can directly jump to the precomputed row and then to the column corresponding to the selected bit inside of the block.
 
 Finally, the select value is the sum of position of the position of the selected segment, the relative index of the block inside of the segment and the relative position of the bit inside of the block:\\
-$select(x) = (C[i] + j_{rel}) * u + k$
+$select(x) = (C[i] + j_{rel}) \times u + k$
 
 
 # Remarks
