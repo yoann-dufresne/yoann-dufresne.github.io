@@ -31,7 +31,7 @@ The character follow your chair movments, help him to avoid the surrounding obst
 * **Artefact**: 3 meters by 3 meters dark room, 8 multicolor led stips, a lot of colored buttons.
 In this game, you goal is to understand the rules of interaction between buttons and colored led strips.
 Artefect is a puzzle game design for zen puzzle solving for groups of people.
-[See more](http://bidouilleurslibristes.org/Artefact/), [Github](https://github.com/yoann-dufresne/Artefact)
+[See more](https://bidouilleurslibristes.github.io/Artefact/), [Github](https://github.com/yoann-dufresne/Artefact)
 
 # Softwares
 
